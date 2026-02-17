@@ -4,6 +4,8 @@
   const SCORE_KEYS = ["game1", "game2", "game3", "game4", "game5"];
 
   let bgAudio = null;
+  let pendingAudioSeek = null;
+  let lastAudioPersistAt = 0;
   let interactionRegistered = false;
 
   function defaultState() {
@@ -18,7 +20,8 @@
       },
       noButtonDodges: 0,
       startedAt: new Date().toISOString(),
-      audioEnabled: Boolean(CONFIG.audioEnabledByDefault)
+      audioEnabled: Boolean(CONFIG.audioEnabledByDefault),
+      audioTime: 0
     };
   }
 
@@ -42,13 +45,17 @@
 
     const startedAt = typeof state.startedAt === "string" ? state.startedAt : fallback.startedAt;
     const audioEnabled = typeof state.audioEnabled === "boolean" ? state.audioEnabled : fallback.audioEnabled;
+    const audioTime = Number.isFinite(Number(state.audioTime)) && Number(state.audioTime) >= 0
+      ? Number(state.audioTime)
+      : 0;
 
     return {
       completedPages: completed,
       scores,
       noButtonDodges,
       startedAt,
-      audioEnabled
+      audioEnabled,
+      audioTime
     };
   }
 
@@ -154,6 +161,7 @@
   }
 
   function goTo(url) {
+    persistAudioTime(true);
     document.body.classList.add("page-exit");
     window.setTimeout(() => {
       window.location.href = url;
@@ -196,6 +204,49 @@
     return CONFIG.audioPath || "assets/audio/raabta-darasal-2017.mp3";
   }
 
+  function applyPendingAudioSeek() {
+    if (!bgAudio || pendingAudioSeek === null) {
+      return;
+    }
+
+    const hasDuration = Number.isFinite(bgAudio.duration) && bgAudio.duration > 0;
+    const target = hasDuration ? Math.min(pendingAudioSeek, Math.max(0, bgAudio.duration - 0.2)) : pendingAudioSeek;
+
+    try {
+      bgAudio.currentTime = target;
+      pendingAudioSeek = null;
+    } catch (_error) {
+      // Some browsers throw before metadata is fully ready.
+    }
+  }
+
+  function restoreAudioTimeFromState() {
+    const state = loadState();
+    const resumeTime = Number(state.audioTime);
+    if (!Number.isFinite(resumeTime) || resumeTime <= 0) {
+      return;
+    }
+
+    pendingAudioSeek = resumeTime;
+    applyPendingAudioSeek();
+  }
+
+  function persistAudioTime(force = false) {
+    if (!bgAudio || !Number.isFinite(bgAudio.currentTime)) {
+      return;
+    }
+
+    const now = Date.now();
+    if (!force && now - lastAudioPersistAt < 350) {
+      return;
+    }
+
+    lastAudioPersistAt = now;
+    const state = loadState();
+    state.audioTime = Math.max(0, Number(bgAudio.currentTime) || 0);
+    saveState(state);
+  }
+
   function ensureAudioElement() {
     if (bgAudio) {
       return bgAudio;
@@ -205,6 +256,25 @@
     bgAudio.loop = true;
     bgAudio.preload = "auto";
     bgAudio.volume = 0.28;
+
+    bgAudio.addEventListener("loadedmetadata", () => {
+      applyPendingAudioSeek();
+    });
+    bgAudio.addEventListener("timeupdate", () => {
+      persistAudioTime(false);
+    });
+    bgAudio.addEventListener("pause", () => {
+      persistAudioTime(true);
+    });
+
+    window.addEventListener("pagehide", () => {
+      persistAudioTime(true);
+    });
+    window.addEventListener("beforeunload", () => {
+      persistAudioTime(true);
+    });
+
+    restoreAudioTimeFromState();
     return bgAudio;
   }
 
@@ -216,12 +286,19 @@
     const audio = ensureAudioElement();
     if (state.audioEnabled) {
       try {
+        if (audio.readyState < 1) {
+          await new Promise((resolve) => {
+            audio.addEventListener("loadedmetadata", resolve, { once: true });
+          });
+        }
+        applyPendingAudioSeek();
         await audio.play();
       } catch (_error) {
         // Browser autoplay policy can block until a user gesture.
       }
     } else {
       audio.pause();
+      persistAudioTime(true);
     }
 
     updateAudioToggleLabels();
