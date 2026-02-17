@@ -4,7 +4,7 @@
   }
 
   const DURATION = 30;
-  const THRESHOLD = 3;
+  const THRESHOLD = 10;
 
   const arena = document.getElementById("runnerArena");
   const overlay = document.getElementById("overlay");

@@ -4,7 +4,7 @@
   }
 
   const photoPaths = window.Promposal.config.photoPaths || [];
-  const revealSequence = [0, 4].filter((idx) => idx < photoPaths.length);
+  const revealSequence = [0, 1, 3, 4].filter((idx) => idx < photoPaths.length);
 
   const memoryImage = document.getElementById("memoryImage");
   const memoryPrompt = document.getElementById("memoryPrompt");
@@ -69,14 +69,13 @@
   }
 
   function showFailure() {
-    window.Promposal.setScore("game3", 1);
-    window.Promposal.markCompleted("game3", 1);
-    statusNode.textContent = "Close enough. Memory gate unlocked in easy mode.";
-    statusNode.classList.add("success");
-    statusNode.classList.remove("error");
-    retryBtn.classList.add("hidden");
-    nextBtn.classList.remove("hidden");
-    memoryPrompt.textContent = "Easy mode assist unlocked this level for you.";
+    window.Promposal.setScore("game3", 0);
+    statusNode.textContent = "Out of attempts. Replay the reel and try again.";
+    statusNode.classList.add("error");
+    statusNode.classList.remove("success");
+    retryBtn.classList.remove("hidden");
+    nextBtn.classList.add("hidden");
+    memoryPrompt.textContent = "No worries. Replay the reel.";
     acceptingInput = false;
     disableThumbs(true);
   }
@@ -161,8 +160,8 @@
   }
 
   async function playReel() {
-    if (photoPaths.length < 3 || revealSequence.length < 3) {
-      statusNode.textContent = "Add at least 3 photos in assets/images to play this level.";
+    if (photoPaths.length < 4 || revealSequence.length < 4) {
+      statusNode.textContent = "Add at least 4 photos in assets/images to play this level.";
       statusNode.classList.add("error");
       return;
     }

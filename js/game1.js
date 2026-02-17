@@ -3,7 +3,7 @@
     return;
   }
 
-  const DURATION = 22;
+  const DURATION = 10;
   const THRESHOLD = 5;
 
   const arena = document.getElementById("snowArena");

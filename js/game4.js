@@ -7,7 +7,7 @@
   const BEAT_INTERVAL = 1100;
   const START_DELAY = 700;
   const GREAT_WINDOW = 520;
-  const PASS_THRESHOLD = 2;
+  const PASS_THRESHOLD = 4;
 
   const startBtn = document.getElementById("startBtn");
   const tapBtn = document.getElementById("tapBtn");
