@@ -3,8 +3,8 @@
     return;
   }
 
-  const DURATION = 25;
-  const THRESHOLD = 10;
+  const DURATION = 30;
+  const THRESHOLD = 5;
 
   const arena = document.getElementById("runnerArena");
   const overlay = document.getElementById("overlay");
@@ -35,27 +35,33 @@
       return;
     }
 
-    const isGood = Math.random() < 0.86;
+    const isGood = Math.random() < 0.95;
     const item = document.createElement("button");
     item.type = "button";
     item.className = `runner-item${isGood ? "" : " bad"}`;
     item.textContent = isGood ? "❤️" : "💔";
 
     const top = 12 + Math.random() * 76;
-    const duration = 6.5 + Math.random() * 2.5;
+    const duration = 10 + Math.random() * 4;
 
     item.style.left = "-8%";
     item.style.top = `${top}%`;
-    item.style.fontSize = `${1.2 + Math.random() * 1.3}rem`;
+    item.style.fontSize = `${1.8 + Math.random() * 1.2}rem`;
 
     item.addEventListener("pointerdown", (event) => {
       event.preventDefault();
       if (!running) {
         return;
       }
-      score += isGood ? 1 : -1;
+      if (isGood) {
+        score += 1;
+      }
       updateMeta();
       item.remove();
+
+      if (score >= THRESHOLD) {
+        finishGame();
+      }
     });
 
     arena.appendChild(item);
@@ -101,7 +107,7 @@
     timeLeft = DURATION;
     running = true;
 
-    statusNode.textContent = "Catch hearts. Avoid heartbreak.";
+    statusNode.textContent = "Easy mode: catch hearts, and ignore broken hearts.";
     statusNode.classList.remove("success", "error");
     retryBtn.classList.add("hidden");
     nextBtn.classList.add("hidden");
@@ -110,7 +116,7 @@
     clearArena();
     updateMeta();
 
-    spawnInterval = window.setInterval(spawnItem, 850);
+    spawnInterval = window.setInterval(spawnItem, 1300);
     timerInterval = window.setInterval(() => {
       timeLeft -= 1;
       updateMeta();
