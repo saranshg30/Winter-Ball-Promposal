@@ -4,7 +4,7 @@
   }
 
   const DURATION = 30;
-  const THRESHOLD = 5;
+  const THRESHOLD = 3;
 
   const arena = document.getElementById("runnerArena");
   const overlay = document.getElementById("overlay");
@@ -35,7 +35,7 @@
       return;
     }
 
-    const isGood = Math.random() < 0.95;
+    const isGood = Math.random() < 0.98;
     const item = document.createElement("button");
     item.type = "button";
     item.className = `runner-item${isGood ? "" : " bad"}`;

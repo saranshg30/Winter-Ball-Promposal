@@ -3,8 +3,8 @@
     return;
   }
 
-  const DURATION = 20;
-  const THRESHOLD = 8;
+  const DURATION = 22;
+  const THRESHOLD = 5;
 
   const arena = document.getElementById("snowArena");
   const overlay = document.getElementById("overlay");
@@ -41,10 +41,10 @@
     flake.textContent = "❄️";
 
     const left = 5 + Math.random() * 90;
-    const fallTime = 6.8 + Math.random() * 3.4;
+    const fallTime = 8.5 + Math.random() * 4.2;
     flake.style.left = `${left}%`;
     flake.style.top = "-8%";
-    flake.style.fontSize = `${1.1 + Math.random() * 1.3}rem`;
+    flake.style.fontSize = `${1.9 + Math.random() * 1.1}rem`;
 
     flake.addEventListener("pointerdown", (event) => {
       event.preventDefault();
@@ -108,7 +108,7 @@
     clearArena();
     updateMeta();
 
-    spawnInterval = window.setInterval(spawnSnowflake, 780);
+    spawnInterval = window.setInterval(spawnSnowflake, 900);
     timerInterval = window.setInterval(() => {
       timeLeft -= 1;
       updateMeta();

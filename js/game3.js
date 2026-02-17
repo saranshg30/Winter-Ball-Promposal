@@ -4,7 +4,7 @@
   }
 
   const photoPaths = window.Promposal.config.photoPaths || [];
-  const revealSequence = [0, 4, 2].filter((idx) => idx < photoPaths.length);
+  const revealSequence = [0, 4].filter((idx) => idx < photoPaths.length);
 
   const memoryImage = document.getElementById("memoryImage");
   const memoryPrompt = document.getElementById("memoryPrompt");
@@ -18,7 +18,7 @@
   const retryBtn = document.getElementById("retryBtn");
   const nextBtn = document.getElementById("nextBtn");
 
-  let attemptsLeft = 3;
+  let attemptsLeft = 5;
   let selected = [];
   let acceptingInput = false;
 
@@ -69,13 +69,14 @@
   }
 
   function showFailure() {
-    window.Promposal.setScore("game3", 0);
-    statusNode.textContent = "Out of attempts. Replay the reel and try again.";
-    statusNode.classList.add("error");
-    statusNode.classList.remove("success");
-    retryBtn.classList.remove("hidden");
-    nextBtn.classList.add("hidden");
-    memoryPrompt.textContent = "No worries. Replay the reel.";
+    window.Promposal.setScore("game3", 1);
+    window.Promposal.markCompleted("game3", 1);
+    statusNode.textContent = "Close enough. Memory gate unlocked in easy mode.";
+    statusNode.classList.add("success");
+    statusNode.classList.remove("error");
+    retryBtn.classList.add("hidden");
+    nextBtn.classList.remove("hidden");
+    memoryPrompt.textContent = "Easy mode assist unlocked this level for you.";
     acceptingInput = false;
     disableThumbs(true);
   }
@@ -96,7 +97,7 @@
       return;
     }
 
-    statusNode.textContent = `Wrong order. ${attemptsLeft} attempt(s) left.`;
+    statusNode.textContent = `Not quite. ${attemptsLeft} attempt(s) left.`;
     statusNode.classList.add("error");
     statusNode.classList.remove("success");
     acceptingInput = false;
@@ -129,7 +130,9 @@
 
   function renderThumbs() {
     thumbGrid.innerHTML = "";
-    const indexes = window.Promposal.shuffle(photoPaths.map((_path, idx) => idx));
+    const decoys = photoPaths.map((_path, idx) => idx).filter((idx) => !revealSequence.includes(idx));
+    const extra = decoys.length > 0 ? [window.Promposal.shuffle(decoys)[0]] : [];
+    const indexes = window.Promposal.shuffle([...revealSequence, ...extra]);
 
     indexes.forEach((index) => {
       const button = document.createElement("button");
@@ -176,10 +179,11 @@
 
     for (let i = 0; i < revealSequence.length; i += 1) {
       revealFrame(revealSequence[i], i + 1, revealSequence.length);
-      await new Promise((resolve) => window.setTimeout(resolve, 1450));
+      await new Promise((resolve) => window.setTimeout(resolve, 2200));
     }
 
-    memoryPrompt.textContent = "Now tap the same 3 photos in order.";
+    const hint = revealSequence.map((index) => `Photo ${index + 1}`).join(" → ");
+    memoryPrompt.textContent = `Now tap the same ${revealSequence.length} photos in order. Hint: ${hint}.`;
     renderThumbs();
     selectionZone.classList.remove("hidden");
     disableThumbs(false);
@@ -188,7 +192,7 @@
   }
 
   function resetLevel() {
-    attemptsLeft = 3;
+    attemptsLeft = 5;
     updateCounters();
     clearSelection();
     statusNode.textContent = "This one tests true memory power.";
@@ -199,7 +203,7 @@
   }
 
   startBtn.addEventListener("click", () => {
-    attemptsLeft = 3;
+    attemptsLeft = 5;
     updateCounters();
     playReel();
   });

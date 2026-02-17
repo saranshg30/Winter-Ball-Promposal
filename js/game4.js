@@ -3,11 +3,11 @@
     return;
   }
 
-  const TOTAL_BEATS = 12;
-  const BEAT_INTERVAL = 900;
-  const START_DELAY = 1000;
-  const GREAT_WINDOW = 180;
-  const PASS_THRESHOLD = 8;
+  const TOTAL_BEATS = 8;
+  const BEAT_INTERVAL = 1100;
+  const START_DELAY = 700;
+  const GREAT_WINDOW = 520;
+  const PASS_THRESHOLD = 2;
 
   const startBtn = document.getElementById("startBtn");
   const tapBtn = document.getElementById("tapBtn");
@@ -126,7 +126,7 @@
     startBtn.disabled = true;
     retryBtn.classList.add("hidden");
     nextBtn.classList.add("hidden");
-    statusNode.textContent = "Catch the pulse. Tap close to each beat.";
+    statusNode.textContent = "Easy mode: tap along with the pulse.";
     statusNode.classList.remove("success", "error");
 
     startTime = performance.now() + START_DELAY;
