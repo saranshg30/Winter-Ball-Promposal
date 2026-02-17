@@ -3,10 +3,7 @@
   const STATE_KEY = "promposal_state_v1";
   const SCORE_KEYS = ["game1", "game2", "game3", "game4", "game5"];
 
-  let audioContext = null;
-  let masterGain = null;
-  let synthStarted = false;
-  let shimmerInterval = null;
+  let bgAudio = null;
   let interactionRegistered = false;
 
   function defaultState() {
@@ -195,57 +192,20 @@
     });
   }
 
-  function createSynthIfNeeded() {
-    if (synthStarted || !(window.AudioContext || window.webkitAudioContext)) {
-      return;
+  function getAudioPath() {
+    return CONFIG.audioPath || "assets/audio/raabta-darasal-2017.mp3";
+  }
+
+  function ensureAudioElement() {
+    if (bgAudio) {
+      return bgAudio;
     }
 
-    const Ctx = window.AudioContext || window.webkitAudioContext;
-    audioContext = new Ctx();
-
-    masterGain = audioContext.createGain();
-    masterGain.gain.value = 0;
-    masterGain.connect(audioContext.destination);
-
-    const lowPass = audioContext.createBiquadFilter();
-    lowPass.type = "lowpass";
-    lowPass.frequency.value = 980;
-    lowPass.Q.value = 0.8;
-    lowPass.connect(masterGain);
-
-    const baseFrequencies = [196, 246.94, 293.66];
-    baseFrequencies.forEach((freq, idx) => {
-      const oscillator = audioContext.createOscillator();
-      oscillator.type = idx === 1 ? "triangle" : "sine";
-      oscillator.frequency.value = freq;
-      oscillator.detune.value = idx * 4;
-
-      const gain = audioContext.createGain();
-      gain.gain.value = idx === 1 ? 0.06 : 0.04;
-
-      oscillator.connect(gain);
-      gain.connect(lowPass);
-      oscillator.start();
-    });
-
-    const lfo = audioContext.createOscillator();
-    lfo.type = "sine";
-    lfo.frequency.value = 0.07;
-
-    const lfoGain = audioContext.createGain();
-    lfoGain.gain.value = 0.015;
-    lfo.connect(lfoGain);
-    lfoGain.connect(masterGain.gain);
-    lfo.start();
-
-    shimmerInterval = window.setInterval(() => {
-      if (!audioContext || audioContext.state !== "running") {
-        return;
-      }
-      lowPass.frequency.setTargetAtTime(840 + Math.random() * 300, audioContext.currentTime, 0.9);
-    }, 2200);
-
-    synthStarted = true;
+    bgAudio = new Audio(getAudioPath());
+    bgAudio.loop = true;
+    bgAudio.preload = "auto";
+    bgAudio.volume = 0.28;
+    return bgAudio;
   }
 
   async function setAudioEnabled(enabled) {
@@ -253,16 +213,15 @@
     state.audioEnabled = Boolean(enabled);
     saveState(state);
 
+    const audio = ensureAudioElement();
     if (state.audioEnabled) {
-      createSynthIfNeeded();
-      if (audioContext && audioContext.state === "suspended") {
-        await audioContext.resume();
+      try {
+        await audio.play();
+      } catch (_error) {
+        // Browser autoplay policy can block until a user gesture.
       }
-      if (audioContext && masterGain) {
-        masterGain.gain.setTargetAtTime(0.24, audioContext.currentTime, 0.8);
-      }
-    } else if (audioContext && masterGain) {
-      masterGain.gain.setTargetAtTime(0, audioContext.currentTime, 0.4);
+    } else {
+      audio.pause();
     }
 
     updateAudioToggleLabels();

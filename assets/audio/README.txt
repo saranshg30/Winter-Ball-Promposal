@@ -1,2 +1,5 @@
-Ambient audio is generated live by `js/common.js`.
-No static audio file is required.
+Background track used by the site:
+- raabta-darasal-2017.mp3
+
+Configured in:
+- js/config.js -> audioPath

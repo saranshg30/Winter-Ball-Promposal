@@ -5,6 +5,7 @@ window.PROMPOSAL_CONFIG = {
   eventDateLong: "19 February 2026",
   signature: "From me, Wha-",
   audioEnabledByDefault: false,
+  audioPath: "assets/audio/raabta-darasal-2017.mp3",
   photoPaths: [
     "assets/images/candid-1.jpg",
     "assets/images/candid-2.jpg",

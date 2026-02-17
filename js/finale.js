@@ -10,14 +10,21 @@
   const celebration = document.getElementById("celebration");
   const confettiLayer = document.getElementById("confettiLayer");
   const questionText = document.getElementById("questionText");
+  const noChallenge = document.getElementById("noChallenge");
 
   let dodges = window.Promposal.loadState().noButtonDodges || 0;
 
   function updateNoButtonLabel() {
     if (dodges >= 5) {
       noBtn.textContent = `Nice try, ${window.Promposal.config.partnerName || "Tanvi"} 😄`;
+      if (noChallenge) {
+        noChallenge.textContent = "You caught it. Challenge complete.";
+      }
     } else {
       noBtn.textContent = "No";
+      if (noChallenge) {
+        noChallenge.textContent = "Click NO if you can.";
+      }
     }
   }
 
@@ -88,6 +95,9 @@
     yesBtn.disabled = true;
     noBtn.disabled = true;
     yesBtn.textContent = "Yesss 💛";
+    if (noChallenge) {
+      noChallenge.classList.add("hidden");
+    }
 
     questionText.style.textShadow = "0 0 28px rgba(232,168,61,0.55)";
     questionText.style.transform = "scale(1.02)";
@@ -104,4 +114,7 @@
   yesBtn.addEventListener("click", celebrateYes);
 
   updateNoButtonLabel();
+  if (dodges < 5) {
+    statusNode.textContent = "Click NO if you can, or hit Yes.";
+  }
 })();

@@ -27,8 +27,11 @@ Keep the same filenames to avoid code changes.
 
 ## Audio behavior
 
-No external audio file is required.
-Ambient background sound is generated in-browser using Web Audio API and can be toggled with `Sound: On/Off`.
+Background music is loaded from:
+
+- `assets/audio/raabta-darasal-2017.mp3`
+
+Playback can be toggled with `Sound: On/Off` on every page.
 
 ## Run locally
 
