@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Winter Carnival Quest</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body data-page="index">
+    <main class="page-shell">
+      <div class="string-lights" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+      </div>
+
+      <header class="top-bar">
+        <div class="brand">Winter Carnival Quest</div>
+        <div class="controls">
+          <span class="progress-chip" data-progress>0/5 levels cleared</span>
+          <button class="btn-secondary" data-audio-toggle type="button">Sound: Off</button>
+          <button class="btn-danger" data-reset-progress type="button">Reset</button>
+        </div>
+      </header>
+
+      <section class="panel hero" aria-labelledby="title">
+        <div>
+          <h1 id="title">A Winter Carnival Quest for <span data-partner-name>Tanvi</span></h1>
+          <p class="lead">
+            Five levels. One dramatic finale. One very important question for
+            <strong><span data-event-name>Winter Ball</span></strong> at
+            <strong><span data-venue>Ashoka University</span></strong> on
+            <strong><span data-event-date>19 February 2026</span></strong>.
+          </p>
+
+          <p class="story-beat">
+            Every win unlocks another clue. Reach the last screen to reveal the final filmy moment.
+          </p>
+
+          <div class="action-row">
+            <button class="btn-primary" id="beginQuest" type="button">Begin the Quest</button>
+          </div>
+        </div>
+
+        <div class="photo-strip">
+          <img src="assets/images/candid-1.jpg" alt="Tanvi and me smiling together" loading="eager" />
+          <img src="assets/images/candid-2.jpg" alt="A sweet candid memory" loading="lazy" />
+          <img src="assets/images/candid-5.jpg" alt="A romantic snapshot together" loading="lazy" />
+        </div>
+      </section>
+
+      <p class="footer-note">
+        Tip: Tap <strong>Sound: On</strong> for the built-in cozy synth ambience.
+      </p>
+    </main>
+
+    <script src="js/config.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/index.js"></script>
+  </body>
+</html>

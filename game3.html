@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Level 3 - Flashback Blitz</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body data-page="game3">
+    <main class="page-shell">
+      <div class="string-lights" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+      </div>
+
+      <header class="top-bar">
+        <div class="brand">Level 3 · Flashback Blitz</div>
+        <div class="controls">
+          <span class="progress-chip" data-progress>0/5 levels cleared</span>
+          <button class="btn-secondary" data-audio-toggle type="button">Sound: Off</button>
+          <button class="btn-danger" data-reset-progress type="button">Reset</button>
+        </div>
+      </header>
+
+      <section class="panel game-layout" aria-labelledby="game3-title">
+        <div class="game-head">
+          <div>
+            <h2 id="game3-title">Memory reel challenge</h2>
+            <p class="lead">Watch 3 moments in order, then tap the same 3 photos in the exact sequence. You get 3 attempts.</p>
+          </div>
+          <div class="meta">
+            <span class="meta-pill">Attempts left: <span id="attemptsLeft">3</span></span>
+            <span class="meta-pill">Selected: <span id="selectedCount">0</span>/3</span>
+          </div>
+        </div>
+
+        <div class="game-panel" id="panel">
+          <div class="memory-stage" id="memoryStage">
+            <div class="memory-frame" id="memoryFrame">
+              <img id="memoryImage" src="assets/images/candid-1.jpg" alt="Memory preview" />
+            </div>
+            <p id="memoryPrompt">Press start to watch the memory reel.</p>
+            <button class="btn-primary" id="startBtn" type="button">Start Reel</button>
+          </div>
+        </div>
+
+        <div id="selectionZone" class="hidden">
+          <h3 style="margin-top:0">Tap the 3 photos in the shown order</h3>
+          <div class="thumbnail-grid" id="thumbGrid"></div>
+          <div class="selected-sequence" id="selectedSequence"></div>
+        </div>
+
+        <p class="status-text" id="statusText">This one tests true memory power.</p>
+
+        <div class="action-row">
+          <button class="btn-secondary hidden" id="retryBtn" type="button">Replay Reel</button>
+          <button class="btn-primary hidden" id="nextBtn" type="button">Go to Level 4</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="js/config.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/game3.js"></script>
+  </body>
+</html>

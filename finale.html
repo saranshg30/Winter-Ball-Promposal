@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Finale - Winter Ball Proposal</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body data-page="finale">
+    <div class="confetti-layer" id="confettiLayer" aria-hidden="true"></div>
+
+    <main class="page-shell">
+      <div class="string-lights" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+      </div>
+
+      <header class="top-bar">
+        <div class="brand">Finale · The Big Question</div>
+        <div class="controls">
+          <span class="progress-chip" data-progress>5/5 levels cleared</span>
+          <button class="btn-secondary" data-audio-toggle type="button">Sound: Off</button>
+          <button class="btn-danger" data-reset-progress type="button">Reset</button>
+        </div>
+      </header>
+
+      <section class="panel finale-card" aria-live="polite">
+        <h1 class="finale-question" id="questionText">
+          <span data-partner-name>Tanvi</span>, will you go to
+          <span data-event-name>Winter Ball</span> with me at
+          <span data-venue>Ashoka University</span> on
+          <span data-event-date>19 February 2026</span>?
+        </h1>
+
+        <div class="choice-zone">
+          <div class="choice-buttons" id="choiceButtons">
+            <button class="btn-primary yes-btn" id="yesBtn" type="button">Yes 💛</button>
+            <button class="btn-secondary no-btn" id="noBtn" type="button">No</button>
+          </div>
+        </div>
+
+        <p class="status-text" id="statusText">Choose wisely.</p>
+
+        <div class="celebration hidden" id="celebration">
+          <p style="margin:0 0 0.5rem">
+            Best answer ever. Winter Ball mission complete.
+          </p>
+          <div class="signature" data-signature>From me, Wha-</div>
+        </div>
+      </section>
+    </main>
+
+    <script src="js/config.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/finale.js"></script>
+  </body>
+</html>

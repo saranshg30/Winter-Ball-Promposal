@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Level 1 - Snow Rush</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body data-page="game1">
+    <main class="page-shell">
+      <div class="string-lights" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+      </div>
+
+      <header class="top-bar">
+        <div class="brand">Level 1 · Snow Rush</div>
+        <div class="controls">
+          <span class="progress-chip" data-progress>0/5 levels cleared</span>
+          <button class="btn-secondary" data-audio-toggle type="button">Sound: Off</button>
+          <button class="btn-danger" data-reset-progress type="button">Reset</button>
+        </div>
+      </header>
+
+      <section class="panel game-layout" aria-labelledby="game1-title">
+        <div class="game-head">
+          <div>
+            <h2 id="game1-title">Catch the snowfall magic</h2>
+            <p class="lead">Tap the falling snowflakes for 20 seconds. Need <strong>18+</strong> points to clear this level.</p>
+          </div>
+          <div class="meta">
+            <span class="meta-pill">Time: <span id="timeLeft">20</span>s</span>
+            <span class="meta-pill">Score: <span id="score">0</span></span>
+          </div>
+        </div>
+
+        <div class="game-panel" id="panel">
+          <div class="arena" id="snowArena" aria-label="Snowflake game field"></div>
+          <div class="game-overlay" id="overlay">
+            <h3>Ready for the first challenge?</h3>
+            <p>Tap every ❄️ as fast as possible.</p>
+            <button class="btn-primary" id="startBtn" type="button">Start Level</button>
+          </div>
+        </div>
+
+        <p class="status-text" id="statusText">Win this level to unlock the next clue.</p>
+
+        <div class="action-row">
+          <button class="btn-secondary hidden" id="retryBtn" type="button">Retry Level</button>
+          <button class="btn-primary hidden" id="nextBtn" type="button">Go to Level 2</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="js/config.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/game1.js"></script>
+  </body>
+</html>

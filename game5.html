@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Level 5 - Final Lock</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body data-page="game5">
+    <main class="page-shell">
+      <div class="string-lights" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+      </div>
+
+      <header class="top-bar">
+        <div class="brand">Level 5 · Final Lock</div>
+        <div class="controls">
+          <span class="progress-chip" data-progress>0/5 levels cleared</span>
+          <button class="btn-secondary" data-audio-toggle type="button">Sound: Off</button>
+          <button class="btn-danger" data-reset-progress type="button">Reset</button>
+        </div>
+      </header>
+
+      <section class="panel game-layout" aria-labelledby="game5-title">
+        <div>
+          <h2 id="game5-title">Decode the final key</h2>
+          <p class="lead">Use all clues and enter the unlock phrase to reach the finale.</p>
+        </div>
+
+        <div class="lock-layout">
+          <div>
+            <h3>Clues</h3>
+            <ol class="clue-list">
+              <li>Who is this for? <strong><span data-partner-name>Tanvi</span></strong></li>
+              <li>Where are we going? <strong><span data-venue>Ashoka University</span></strong></li>
+              <li>When is it? <strong><span data-event-date>19 February 2026</span></strong></li>
+            </ol>
+          </div>
+
+          <div class="lock-card">
+            <h3 style="color:#fff5e8">Enter unlock code</h3>
+            <p style="margin:0;color:rgba(255,245,232,0.8)">Format hint: NAME + DDMMYYYY</p>
+            <input
+              id="codeInput"
+              class="lock-input"
+              type="text"
+              placeholder="TANVI19022026"
+              autocomplete="off"
+              spellcheck="false"
+              aria-label="Unlock code"
+            />
+            <div class="action-row" style="margin-top:0.3rem">
+              <button class="btn-primary" id="submitBtn" type="button">Unlock</button>
+            </div>
+          </div>
+        </div>
+
+        <p class="status-text" id="statusText">One final level between you and the proposal.</p>
+
+        <div class="action-row">
+          <button class="btn-primary hidden" id="nextBtn" type="button">Go to Finale</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="js/config.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/game5.js"></script>
+  </body>
+</html>

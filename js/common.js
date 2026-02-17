@@ -1,0 +1,380 @@
+(() => {
+  const CONFIG = window.PROMPOSAL_CONFIG || {};
+  const STATE_KEY = "promposal_state_v1";
+  const SCORE_KEYS = ["game1", "game2", "game3", "game4", "game5"];
+
+  let audioContext = null;
+  let masterGain = null;
+  let synthStarted = false;
+  let shimmerInterval = null;
+  let interactionRegistered = false;
+
+  function defaultState() {
+    return {
+      completedPages: [],
+      scores: {
+        game1: 0,
+        game2: 0,
+        game3: 0,
+        game4: 0,
+        game5: 0
+      },
+      noButtonDodges: 0,
+      startedAt: new Date().toISOString(),
+      audioEnabled: Boolean(CONFIG.audioEnabledByDefault)
+    };
+  }
+
+  function sanitizeState(raw) {
+    const fallback = defaultState();
+    const state = raw && typeof raw === "object" ? raw : {};
+
+    const completed = Array.isArray(state.completedPages)
+      ? state.completedPages.filter((page) => SCORE_KEYS.includes(page))
+      : [];
+
+    const scores = { ...fallback.scores, ...(state.scores || {}) };
+    SCORE_KEYS.forEach((key) => {
+      const val = Number(scores[key]);
+      scores[key] = Number.isFinite(val) ? val : 0;
+    });
+
+    const noButtonDodges = Number.isFinite(Number(state.noButtonDodges))
+      ? Number(state.noButtonDodges)
+      : 0;
+
+    const startedAt = typeof state.startedAt === "string" ? state.startedAt : fallback.startedAt;
+    const audioEnabled = typeof state.audioEnabled === "boolean" ? state.audioEnabled : fallback.audioEnabled;
+
+    return {
+      completedPages: completed,
+      scores,
+      noButtonDodges,
+      startedAt,
+      audioEnabled
+    };
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STATE_KEY);
+      if (!raw) {
+        const fresh = defaultState();
+        localStorage.setItem(STATE_KEY, JSON.stringify(fresh));
+        return fresh;
+      }
+      const parsed = JSON.parse(raw);
+      const sanitized = sanitizeState(parsed);
+      localStorage.setItem(STATE_KEY, JSON.stringify(sanitized));
+      return sanitized;
+    } catch (_error) {
+      const fresh = defaultState();
+      localStorage.setItem(STATE_KEY, JSON.stringify(fresh));
+      return fresh;
+    }
+  }
+
+  function saveState(state) {
+    localStorage.setItem(STATE_KEY, JSON.stringify(sanitizeState(state)));
+  }
+
+  function updateState(mutator) {
+    const state = loadState();
+    const nextState = mutator({ ...state, scores: { ...state.scores }, completedPages: [...state.completedPages] });
+    saveState(nextState);
+    updateProgressLabels();
+    updateAudioToggleLabels();
+    return nextState;
+  }
+
+  function setScore(page, score) {
+    if (!SCORE_KEYS.includes(page)) {
+      return;
+    }
+    updateState((state) => {
+      state.scores[page] = Number(score) || 0;
+      return state;
+    });
+  }
+
+  function markCompleted(page, score) {
+    if (!SCORE_KEYS.includes(page)) {
+      return;
+    }
+    updateState((state) => {
+      if (!state.completedPages.includes(page)) {
+        state.completedPages.push(page);
+      }
+      if (typeof score === "number") {
+        state.scores[page] = score;
+      }
+      return state;
+    });
+  }
+
+  function isCompleted(page) {
+    return loadState().completedPages.includes(page);
+  }
+
+  function allGamesCompleted() {
+    const state = loadState();
+    return SCORE_KEYS.every((page) => state.completedPages.includes(page));
+  }
+
+  function resetProgress() {
+    saveState(defaultState());
+  }
+
+  function requiredRedirect(pageId) {
+    if (!pageId) {
+      return null;
+    }
+
+    if (pageId === "game1") {
+      return null;
+    }
+
+    if (pageId === "finale") {
+      return allGamesCompleted() ? null : "game5.html";
+    }
+
+    const index = SCORE_KEYS.indexOf(pageId);
+    if (index <= 0) {
+      return null;
+    }
+
+    const previous = SCORE_KEYS[index - 1];
+    return isCompleted(previous) ? null : `${previous}.html`;
+  }
+
+  function requirePageAccess(pageId) {
+    const redirect = requiredRedirect(pageId);
+    if (!redirect) {
+      return true;
+    }
+    window.location.replace(redirect);
+    return false;
+  }
+
+  function goTo(url) {
+    document.body.classList.add("page-exit");
+    window.setTimeout(() => {
+      window.location.href = url;
+    }, 240);
+  }
+
+  function updateConfigText() {
+    document.querySelectorAll("[data-partner-name]").forEach((node) => {
+      node.textContent = CONFIG.partnerName || "Tanvi";
+    });
+
+    document.querySelectorAll("[data-event-name]").forEach((node) => {
+      node.textContent = CONFIG.eventName || "Winter Ball";
+    });
+
+    document.querySelectorAll("[data-venue]").forEach((node) => {
+      node.textContent = CONFIG.venue || "Ashoka University";
+    });
+
+    document.querySelectorAll("[data-event-date]").forEach((node) => {
+      node.textContent = CONFIG.eventDateLong || "19 February 2026";
+    });
+
+    document.querySelectorAll("[data-signature]").forEach((node) => {
+      node.textContent = CONFIG.signature || "From me, Wha-";
+    });
+  }
+
+  function updateProgressLabels() {
+    const state = loadState();
+    const done = state.completedPages.length;
+    const total = SCORE_KEYS.length;
+
+    document.querySelectorAll("[data-progress]").forEach((node) => {
+      node.textContent = `${done}/${total} levels cleared`;
+    });
+  }
+
+  function createSynthIfNeeded() {
+    if (synthStarted || !(window.AudioContext || window.webkitAudioContext)) {
+      return;
+    }
+
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    audioContext = new Ctx();
+
+    masterGain = audioContext.createGain();
+    masterGain.gain.value = 0;
+    masterGain.connect(audioContext.destination);
+
+    const lowPass = audioContext.createBiquadFilter();
+    lowPass.type = "lowpass";
+    lowPass.frequency.value = 980;
+    lowPass.Q.value = 0.8;
+    lowPass.connect(masterGain);
+
+    const baseFrequencies = [196, 246.94, 293.66];
+    baseFrequencies.forEach((freq, idx) => {
+      const oscillator = audioContext.createOscillator();
+      oscillator.type = idx === 1 ? "triangle" : "sine";
+      oscillator.frequency.value = freq;
+      oscillator.detune.value = idx * 4;
+
+      const gain = audioContext.createGain();
+      gain.gain.value = idx === 1 ? 0.06 : 0.04;
+
+      oscillator.connect(gain);
+      gain.connect(lowPass);
+      oscillator.start();
+    });
+
+    const lfo = audioContext.createOscillator();
+    lfo.type = "sine";
+    lfo.frequency.value = 0.07;
+
+    const lfoGain = audioContext.createGain();
+    lfoGain.gain.value = 0.015;
+    lfo.connect(lfoGain);
+    lfoGain.connect(masterGain.gain);
+    lfo.start();
+
+    shimmerInterval = window.setInterval(() => {
+      if (!audioContext || audioContext.state !== "running") {
+        return;
+      }
+      lowPass.frequency.setTargetAtTime(840 + Math.random() * 300, audioContext.currentTime, 0.9);
+    }, 2200);
+
+    synthStarted = true;
+  }
+
+  async function setAudioEnabled(enabled) {
+    const state = loadState();
+    state.audioEnabled = Boolean(enabled);
+    saveState(state);
+
+    if (state.audioEnabled) {
+      createSynthIfNeeded();
+      if (audioContext && audioContext.state === "suspended") {
+        await audioContext.resume();
+      }
+      if (audioContext && masterGain) {
+        masterGain.gain.setTargetAtTime(0.24, audioContext.currentTime, 0.8);
+      }
+    } else if (audioContext && masterGain) {
+      masterGain.gain.setTargetAtTime(0, audioContext.currentTime, 0.4);
+    }
+
+    updateAudioToggleLabels();
+  }
+
+  function updateAudioToggleLabels() {
+    const enabled = Boolean(loadState().audioEnabled);
+    document.querySelectorAll("[data-audio-toggle]").forEach((button) => {
+      button.textContent = enabled ? "Sound: On" : "Sound: Off";
+      button.setAttribute("aria-pressed", enabled ? "true" : "false");
+    });
+  }
+
+  function registerFirstInteraction() {
+    if (interactionRegistered) {
+      return;
+    }
+
+    const activate = () => {
+      const state = loadState();
+      if (state.audioEnabled) {
+        void setAudioEnabled(true);
+      }
+      window.removeEventListener("pointerdown", activate);
+      window.removeEventListener("keydown", activate);
+    };
+
+    window.addEventListener("pointerdown", activate, { once: true, passive: true });
+    window.addEventListener("keydown", activate, { once: true });
+    interactionRegistered = true;
+  }
+
+  function bindAudioToggles() {
+    document.querySelectorAll("[data-audio-toggle]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const enabled = !loadState().audioEnabled;
+        await setAudioEnabled(enabled);
+      });
+    });
+
+    updateAudioToggleLabels();
+  }
+
+  function bindResetButtons() {
+    document.querySelectorAll("[data-reset-progress]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const confirmReset = window.confirm("Reset quest progress and start over?");
+        if (!confirmReset) {
+          return;
+        }
+        const state = loadState();
+        const keepAudio = state.audioEnabled;
+        resetProgress();
+        updateState((fresh) => {
+          fresh.audioEnabled = keepAudio;
+          return fresh;
+        });
+        goTo("index.html");
+      });
+    });
+  }
+
+  function initPage(options = {}) {
+    const { pageId } = options;
+
+    if (pageId && !requirePageAccess(pageId)) {
+      return false;
+    }
+
+    updateConfigText();
+    updateProgressLabels();
+    bindAudioToggles();
+    bindResetButtons();
+    registerFirstInteraction();
+
+    window.requestAnimationFrame(() => {
+      document.body.classList.add("page-ready");
+    });
+
+    return true;
+  }
+
+  function shuffle(list) {
+    const arr = [...list];
+    for (let i = arr.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function setNoDodges(count) {
+    updateState((state) => {
+      state.noButtonDodges = Number(count) || 0;
+      return state;
+    });
+  }
+
+  window.Promposal = {
+    STATE_KEY,
+    loadState,
+    saveState,
+    setScore,
+    markCompleted,
+    isCompleted,
+    allGamesCompleted,
+    requirePageAccess,
+    goTo,
+    initPage,
+    shuffle,
+    setAudioEnabled,
+    setNoDodges,
+    config: CONFIG
+  };
+})();

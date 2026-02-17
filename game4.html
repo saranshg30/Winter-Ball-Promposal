@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Level 4 - Rhythm of Us</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body data-page="game4">
+    <main class="page-shell">
+      <div class="string-lights" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+      </div>
+
+      <header class="top-bar">
+        <div class="brand">Level 4 · Rhythm of Us</div>
+        <div class="controls">
+          <span class="progress-chip" data-progress>0/5 levels cleared</span>
+          <button class="btn-secondary" data-audio-toggle type="button">Sound: Off</button>
+          <button class="btn-danger" data-reset-progress type="button">Reset</button>
+        </div>
+      </header>
+
+      <section class="panel game-layout" aria-labelledby="game4-title">
+        <div class="game-head">
+          <div>
+            <h2 id="game4-title">Hit the beat</h2>
+            <p class="lead">A ring pulses 12 times. Tap in rhythm and score at least <strong>8 Great hits</strong>.</p>
+          </div>
+          <div class="meta">
+            <span class="meta-pill">Great Hits: <span id="greatHits">0</span></span>
+            <span class="meta-pill">Beat: <span id="beatCount">0</span>/12</span>
+          </div>
+        </div>
+
+        <div class="game-panel" id="panel">
+          <div class="rhythm-stage">
+            <div class="ring-wrap">
+              <div class="ring" id="ring"></div>
+              <div class="ring-inner"></div>
+              <button class="tap-btn" id="tapBtn" type="button">TAP</button>
+            </div>
+            <div class="beat-track" id="beatTrack" aria-label="Beat progress"></div>
+            <button class="btn-primary" id="startBtn" type="button">Start Rhythm</button>
+          </div>
+        </div>
+
+        <p class="status-text" id="statusText">Find the groove before the final lock.</p>
+
+        <div class="action-row">
+          <button class="btn-secondary hidden" id="retryBtn" type="button">Retry Level</button>
+          <button class="btn-primary hidden" id="nextBtn" type="button">Go to Level 5</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="js/config.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/game4.js"></script>
+  </body>
+</html>
