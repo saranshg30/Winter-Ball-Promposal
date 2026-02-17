@@ -4,7 +4,7 @@
   }
 
   const DURATION = 25;
-  const THRESHOLD = 22;
+  const THRESHOLD = 10;
 
   const arena = document.getElementById("runnerArena");
   const overlay = document.getElementById("overlay");
@@ -35,14 +35,14 @@
       return;
     }
 
-    const isGood = Math.random() < 0.74;
+    const isGood = Math.random() < 0.86;
     const item = document.createElement("button");
     item.type = "button";
     item.className = `runner-item${isGood ? "" : " bad"}`;
     item.textContent = isGood ? "❤️" : "💔";
 
     const top = 12 + Math.random() * 76;
-    const duration = 2.1 + Math.random() * 1.4;
+    const duration = 6.5 + Math.random() * 2.5;
 
     item.style.left = "-8%";
     item.style.top = `${top}%`;
@@ -53,7 +53,7 @@
       if (!running) {
         return;
       }
-      score += isGood ? 1 : -2;
+      score += isGood ? 1 : -1;
       updateMeta();
       item.remove();
     });
@@ -110,7 +110,7 @@
     clearArena();
     updateMeta();
 
-    spawnInterval = window.setInterval(spawnItem, 300);
+    spawnInterval = window.setInterval(spawnItem, 850);
     timerInterval = window.setInterval(() => {
       timeLeft -= 1;
       updateMeta();
